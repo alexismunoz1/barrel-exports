@@ -108,7 +108,7 @@ export * from "./Input";
 ```
 
 **Risk:** High
-**Why:** `export *` forces the bundler to evaluate every source module to discover what's exported. Named re-exports (`export { Button } from "./Button"`) are marginally better because the bundler knows the shape upfront, but tree-shaking still depends on `sideEffects: false`.
+**Why:** `export *` forces the bundler to evaluate every source module to discover what's exported. Named re-exports (`export { Button } from "./Button"`) are marginally better because the bundler knows the shape upfront, but tree-shaking is still unreliable for large barrels.
 **Fix:** Use named re-exports at minimum. Prefer direct imports for consumers.
 
 ### 5. Mixed Barrel (Code + Re-exports)
@@ -140,7 +140,7 @@ export { Checkbox } from "./Checkbox";
 ```
 
 **Risk:** Low
-**Why:** Small barrels with few exports are low-impact. Tree-shaking handles them well when `sideEffects: false` is set.
+**Why:** Small barrels with few exports are low-impact. Tree-shaking generally handles them well.
 **When it becomes a problem:** When consumed by a parent barrel (`export * from "./forms"`), creating a chain.
 **Fix:** Usually fine to keep. Address only if part of a chain or if the barrel has side effects.
 
@@ -262,9 +262,5 @@ Does the barrel re-export >20 modules?
 
 Is the barrel part of a chain (nested barrels)?
   YES → Migrate to direct imports (chain amplifies impact)
-  NO ↓
-
-Is sideEffects: false set in package.json?
-  YES → Barrel is probably fine, tree-shaking should work
-  NO → Add sideEffects: false, verify with build metrics
+  NO → Barrel is probably fine if it has no side effects; verify with build metrics
 ```

@@ -114,24 +114,6 @@ For each `index.ts` / `index.tsx` file:
 
 ## Package.json Checks
 
-### `sideEffects` Field
-
-```json
-// GOOD: Declares the package as side-effect free
-{ "sideEffects": false }
-
-// GOOD: Declares specific files with side effects
-{ "sideEffects": ["*.css", "*.scss", "./src/polyfills.ts"] }
-
-// BAD: Field missing entirely — bundler assumes ALL files may have side effects
-// (no sideEffects field)
-
-// BAD: Set to true — same as missing
-{ "sideEffects": true }
-```
-
-**Impact:** Without `"sideEffects": false`, webpack and Next.js cannot safely tree-shake unused re-exports from barrels.
-
 ### `exports` Field (Subpath Exports)
 
 ```json
@@ -245,7 +227,6 @@ Use this template for the analysis report:
 
 | Check | Status | Details |
 |-------|--------|---------|
-| sideEffects field | ⚠️ Missing | Add `"sideEffects": false` to package.json |
 | Subpath exports | ⚠️ Missing | Add `exports` field for direct import paths |
 | optimizePackageImports | ✅ Present | @repo/ui is listed |
 | transpilePackages | ✅ Present | @repo/ui is listed |

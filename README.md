@@ -12,7 +12,7 @@ Barrel files (`index.ts` that re-export everything from a directory) look clean 
 
 - Finds all `index.ts`/`index.tsx` barrel files in your project
 - Classifies each one: pure barrel, mixed, with side effects
-- Checks bundler and package configuration (`sideEffects`, `exports`, `optimizePackageImports`)
+- Checks bundler and package configuration (`exports`, `optimizePackageImports`)
 - Measures current bundle size (Next.js)
 - Generates a risk-level report per file
 

@@ -300,7 +300,7 @@ Run these checks after completing all migrations:
 4. **Bundle comparison:** Compare First Load JS before and after. Expected improvements:
    - Page chunks: 50-95% reduction (depending on how many unused modules were pulled in)
    - First Load JS: 20-40% reduction
-   - If no improvement, check that `sideEffects: false` is set and barrels don't have side effects
+   - If no improvement, check that barrels don't have side effects
 
 5. **Runtime check:** Start the dev server and verify key pages render correctly.
 
@@ -334,4 +334,3 @@ This is why we recommend:
 | Ignoring side-effect imports | Removing `import "./styles.css"` breaks styling | Always preserve side-effect imports |
 | Batch-applying without verification | One bad path breaks the entire build | Verify TypeScript compiles after each file |
 | Forgetting to update re-exports | Intermediate barrels still pull everything | Transform `export { X } from` statements too |
-| Not setting `sideEffects: false` | Bundler can't tree-shake even with direct imports | Add to library's package.json |

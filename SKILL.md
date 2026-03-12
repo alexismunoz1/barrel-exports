@@ -56,7 +56,6 @@ For each file found, read it and classify:
 Inspect the project's bundler and package configuration:
 
 **package.json:**
-- Check for `"sideEffects"` field — if missing, bundler assumes ALL files may have side effects
 - Check for `"exports"` field — subpath exports enable direct imports
 - Check for `"type": "module"` — ESM enables better tree-shaking
 
@@ -99,7 +98,6 @@ Present findings in this format:
 
 ### Configuration Issues
 
-- ⚠️ No `sideEffects` field in package.json
 - ⚠️ No subpath exports configured
 - ✅ `transpilePackages` includes internal packages
 
@@ -189,7 +187,6 @@ After import migration, update configuration:
 **package.json** (of the library being imported):
 ```json
 {
-  "sideEffects": false,
   "exports": {
     ".": "./src/index.ts",
     "./components/*": "./src/components/*.tsx",
