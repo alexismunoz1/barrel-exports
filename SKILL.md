@@ -13,12 +13,12 @@ compatibility: Claude Code
 license: MIT
 metadata:
   author: alexismunoz1
-  version: 1.0.0
+  version: 1.1.0
 ---
 
 # Barrel Exports Analyzer & Migrator
 
-Detects barrel export anti-patterns and safely migrates to direct imports. Every recommendation is backed by real experiment data: barrel imports produced a **224 KB page chunk** vs **11.7 KB with direct imports** — a 19x difference in a controlled Next.js monorepo test.
+Detects barrel export anti-patterns and safely migrates to direct imports. Every recommendation is backed by real experiment data: barrel imports produced a **224 KB page chunk** vs **11.7 KB with direct imports** — a **19x difference** in a controlled Next.js monorepo test. When presenting results, always include both your own measurements from the user's project and this 19x reference data point for context.
 
 ## How It Works
 
@@ -42,29 +42,27 @@ Search for `index.ts` and `index.tsx` files that primarily re-export from other 
 find src/ -name "index.ts" -o -name "index.tsx" | head -50
 ```
 
-For each file found, read it and classify:
+For each file found, read it and classify using **exactly these terms** in your report:
 
 - **Pure barrel** — contains ONLY `export * from` or `export { X } from` statements
 - **Mixed barrel** — has re-exports AND original code (types, constants, logic)
 - **Entry point** — has original code, not primarily re-exports
 - **Side-effect barrel** — has re-exports AND side effects (console.log, global mutations, event listeners)
 
+Always use this taxonomy when reporting — it helps users understand the severity and gives them a shared vocabulary for discussing barrel patterns.
+
 > For the complete classification algorithm and side-effect taxonomy, see `references/analysis-guide.md`
 
 ### Step 2: Check Configuration
 
-Inspect the project's bundler and package configuration:
+Inspect the project's bundler and package configuration. Go through every item in this checklist — don't skip any:
 
-**package.json:**
-- Check for `"exports"` field — subpath exports enable direct imports
-- Check for `"type": "module"` — ESM enables better tree-shaking
-
-**next.config.js/ts** (if Next.js):
-- Check `experimental.optimizePackageImports` — Next.js's built-in barrel optimization
-- Check `transpilePackages` — required for monorepo internal packages
-
-**tsconfig.json:**
-- Check `"moduleResolution"` — must be `"bundler"` or `"node16"` for subpath exports
+- [ ] **package.json `"exports"`** — subpath exports enable direct imports. If missing, this is a key recommendation.
+- [ ] **package.json `"sideEffects"`** — tells the bundler what can be safely tree-shaken. If missing and barrels have no side effects, recommend adding `"sideEffects": false`.
+- [ ] **package.json `"type": "module"`** — ESM enables better tree-shaking
+- [ ] **next.config.js/ts `optimizePackageImports`** (if Next.js) — Next.js's built-in barrel optimization. Always check for this explicitly and report whether it's present or missing.
+- [ ] **next.config.js/ts `transpilePackages`** — required for monorepo internal packages
+- [ ] **tsconfig.json `"moduleResolution"`** — must be `"bundler"` or `"node16"` for subpath exports
 
 ### Step 3: Measure Bundle (Next.js)
 
@@ -123,13 +121,13 @@ When the user asks to migrate barrels, fix barrel exports, or optimize imports, 
 
 ### Step 1: Establish Baseline
 
-If working with Next.js, run a build and record baseline metrics before any changes:
+**Always run a build and record baseline metrics BEFORE touching any imports.** Without a baseline, you cannot prove the impact of the migration. This step is not optional.
 
 ```bash
 npx next build 2>&1
 ```
 
-Save the First Load JS values for comparison after migration.
+Save the First Load JS values and page chunk sizes. You will compare against these numbers after migration to show the user concrete before/after improvement.
 
 ### Step 2: Find Consumers
 
@@ -182,9 +180,10 @@ Wait for user confirmation before applying each file. Group related files if the
 
 ### Step 5: Update Configuration
 
-After import migration, update configuration:
+After import migration, review and update configuration. Even if some fields already exist, verify they cover all the direct paths you need:
 
-**package.json** (of the library being imported):
+**package.json `exports`** (of the library being imported):
+- If the field **doesn't exist**, add it:
 ```json
 {
   "exports": {
@@ -195,6 +194,7 @@ After import migration, update configuration:
   }
 }
 ```
+- If it **already exists**, verify it covers all the subpaths your migration uses. Show the user the current exports and confirm they match the direct import paths. If wildcards are used (`./components/*`), verify the source files follow the expected naming convention.
 
 **next.config.js** (if Next.js, for external packages):
 ```js

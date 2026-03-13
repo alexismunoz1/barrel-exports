@@ -1,0 +1,47 @@
+{
+  "skill_name": "barrel-exports",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Revisa mi monorepo en barrel-vs-direct/ por problemas de barrel exports. Turborepo con Next.js y @repo/ui.",
+      "expected_output": "Identifies barrel files in the monorepo, classifies them by type and risk, checks bundler/package config, and provides a structured analysis report.",
+      "files": [],
+      "expectations": [
+        "Identifies barrel/index.ts files in the @repo/ui package",
+        "Classifies barrel files by type (pure barrel, mixed, entry point)",
+        "Assigns risk levels (Critical, High, Medium, Low) to each barrel",
+        "Checks package.json for exports field and bundler configuration",
+        "Checks next.config for optimizePackageImports setting",
+        "Presents findings in a structured analysis report with table format"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Quiero migrar los barrel imports en barrel-app/ a imports directos. Todo viene de @repo/ui por un index.ts.",
+      "expected_output": "Maps consumer files to their barrel imports, verifies direct paths exist, shows before/after diffs for each file, and processes file by file.",
+      "files": [],
+      "expectations": [
+        "Finds all files in barrel-app/ that import from @repo/ui barrel",
+        "Maps each imported symbol to its direct source file path",
+        "Verifies that direct import paths actually exist before proposing changes",
+        "Shows before/after import diffs for each consumer file",
+        "Processes changes file by file (not bulk auto-apply)",
+        "Suggests updating package.json exports field for subpath imports"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Mi First Load JS es 155 kB, creo que es por como importamos: 'import { Button, Card } from @repo/ui'. Tree-shaking no funciona?",
+      "expected_output": "Explains why barrel imports defeat tree-shaking, identifies the barrel pattern as the cause, references the 19x bundle reduction data, and proposes concrete migration steps.",
+      "files": [],
+      "expectations": [
+        "Explains that barrel imports (index.ts re-exports) defeat tree-shaking",
+        "Identifies the import pattern from @repo/ui as the likely cause of large bundles",
+        "References the 19x bundle size reduction (224 KB vs 11.7 KB) from experiment data",
+        "Recommends migrating to direct imports as the solution",
+        "Suggests running next build to measure baseline before migration",
+        "Proposes checking for side effects in barrel files before migrating"
+      ]
+    }
+  ]
+}
